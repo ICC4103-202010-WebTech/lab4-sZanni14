@@ -8,6 +8,7 @@ class Ticket < ApplicationRecord
   private
 
     def update_stats_tickets_destroyed
+      #Se elimina el ticket, y se resta 1 a los tickets vendidos y a la asistencia del evento
       event_stats = self.ticket_type.event.event_stat
       event_stats.tickets_sold-=1
       event_stats.attendance-=1
@@ -16,19 +17,19 @@ class Ticket < ApplicationRecord
 
     def update_stats_tickets_sold
       event_stats = self.ticket_type.event.event_stat
-      event_stats.tickets_sold+=1
-      event_stats.attendance+=1
-      event_stats.save!
+      capacity = self.ticket_type.event.event_venue.capacity
+
+      if event_stats.tickets_sold+1 > capacity
+        #Si el ticket es creado y los tickets vendidos exceden la capacidad del venue, se levanta el error
+        raise "If this ticket is created, tickets sold exceed venue capacity!!"
+
+      else
+        #Si no se excede la capacidad, se crea el ticket y se aumentan los tickets vendidos y la asistencia del evento
+        event_stats.tickets_sold+=1
+        event_stats.attendance+=1
+        event_stats.save!
+      end
+
     end
-
-      #def check_tickets_sold
-      #event_stats=self.ticket_type.event.event_stat
-      #event_venue=self.ticket_type.event.event_venue
-
-      #if event_stats.tickets_sold>event_venue.capacity
-      # errors.add(:base, "Tickets sold are more than the venue capacity")
-      #end
-
-      #end
 
 end
