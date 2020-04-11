@@ -3,7 +3,7 @@ class Ticket < ApplicationRecord
   belongs_to :ticket_type
 
   after_destroy :update_stats_tickets_destroyed
-  after_create :update_stats_tickets_sold
+  before_create :update_stats_tickets_sold
 
   private
 
